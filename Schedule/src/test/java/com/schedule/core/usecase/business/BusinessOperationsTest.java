@@ -11,25 +11,24 @@ import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.atLeastOnce;
 
 public class BusinessOperationsTest { 
-	private CreateBusiness createBusiness;
-	private GetBusiness getBusiness;
+	private BusinessDao businessDao;
 	private BusinessOperations businessOperations;
 	private Business business;
 	
 	@Before
 	public void setup(){
-		createBusiness = mock(CreateBusiness.class);
-		business = new Business("Test");		
-		getBusiness = mock(GetBusiness.class);
-		businessOperations = new BusinessOperations(createBusiness,getBusiness);
+		businessDao = mock(BusinessDao.class);
+		business = new Business("Test");	
+		businessOperations = new BusinessOperations(businessDao);
 	}
 
 	@Test
 	public void initializeWithCreateInterface() {		 
-		assertNotNull(new BusinessOperations(createBusiness,getBusiness));
+		assertNotNull(new BusinessOperations(businessDao));
 	}
 	
 	@Test
@@ -48,7 +47,7 @@ public class BusinessOperationsTest {
 	
 	@Test
 	public void findBusinessByIdThatExists(){
-		Business expected = givenABusinessIsFound();
+		Business expected = givenABusinessIsFoundById();
 		Business actual = businessOperations.find(1L);
 		assertThat(actual).isEqualTo(expected);
 	}
@@ -56,7 +55,6 @@ public class BusinessOperationsTest {
 	@Test
 	public void createAnExistingBusiness(){
 		givenABusinessIsFound();
-		businessOperations.createBusiness(new Business("test"));
 		assertThatExceptionOfType(BusinessExistsException.class).isThrownBy(() -> businessOperations.createBusiness(business));
 	}
 	
@@ -64,26 +62,40 @@ public class BusinessOperationsTest {
 	public void createBusiness(){
 		givenABusinessIsNotFound();
 		businessOperations.createBusiness(business);
-		Mockito.verify(createBusiness,atLeastOnce()).execute(business);
-	}
-	
-	
+		Mockito.verify(businessDao,atLeastOnce()).create(business);
+	}	
 	
 	@Test
 	public void updateNonExistingBusiness(){
-		givenABusinessIsNotFound();
+		givenABusinessIsNotFoundById();
+		assertThatExceptionOfType(BusinessNotExistingException.class).isThrownBy(() -> businessOperations.updateBusiness(business));
+	}
+	
+	@Test
+	public void updateExistingBusiness(){
+		givenABusinessIsFoundById();
 		businessOperations.updateBusiness(business);
-		
+		Mockito.verify(businessDao,atLeastOnce()).update(business);
 	}
 	
 	
     private Business givenABusinessIsFound() {
         Business expected = new Business("Test");
-        when(getBusiness.find("Test")).thenReturn(expected);
+        when(businessDao.find("Test")).thenReturn(expected);
+        return expected;
+    }
+    
+    private Business givenABusinessIsFoundById() {
+        Business expected = new Business("Test");
+        when(businessDao.find(anyLong())).thenReturn(expected);
         return expected;
     }
     
     private void givenABusinessIsNotFound() { 
-        when(getBusiness.find(anyString())).thenReturn(null);        
+        when(businessDao.find(anyString())).thenReturn(null);        
+    }
+    
+    private void givenABusinessIsNotFoundById() { 
+        when(businessDao.find(anyLong())).thenReturn(null);        
     }
 }

@@ -4,21 +4,32 @@ package com.schedule.core.usecase.business;
 import com.schedule.core.entity.Business;
 
 public class BusinessOperations {
-	private CreateBusiness createBusiness;
-	private GetBusiness getBusiness;
-	
+	private BusinessDao businessDao;	
 
-	public BusinessOperations(CreateBusiness createBusiness,GetBusiness getBusiness){
-		this.createBusiness = createBusiness;
-		this.getBusiness = getBusiness;
+	public BusinessOperations(BusinessDao businessDao){
+		this.businessDao = businessDao;
+	}
+	
+	public void createBusiness(Business business){		
+		if(isBusinessExists(business.getName()))
+			throw new BusinessExistsException();
+		
+		businessDao.create(business);
+	}
+
+	public void updateBusiness(Business business) {		
+		if(!isBusinessExists(business.getId()))
+			throw new BusinessNotExistingException();
+		
+		businessDao.update(business);
 	}
 	
 	public Business find(String businessName){
-		return getBusiness.find(businessName);
+		return businessDao.find(businessName);
 	}
 	
 	public Business find(long id) { 
-		return getBusiness.find(id);
+		return businessDao.find(id);
 	}	
 	
 	public boolean isBusinessExists(String businessName){
@@ -26,24 +37,8 @@ public class BusinessOperations {
 	}
 	
 	public boolean isBusinessExists(long id){
+		System.out.println(find(id));
 		return find(id) != null ? true:false;
-	}
-	
-	public void createBusiness(Business business){
-		
-		if(isBusinessExists(business.getName()))
-			throw new BusinessExistsException();
-		
-		createBusiness.execute(business);
-	}
-
-	public void updateBusiness(Business business) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-	
-	
+	}	
 
 }

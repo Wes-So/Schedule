@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Business {
 
-
+	private long id;
 	private String name;
 	private String status;
 	private final static String ACTIVE = "ACTIVE";
@@ -25,6 +25,14 @@ public class Business {
 	}
 
 	public Business(){
+	}
+	
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 	
 	public void setName(String name) {
