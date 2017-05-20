@@ -2,11 +2,14 @@ package com.schedule.core.entity;
 
 public class Provider extends Person{
 	
+	private Business business;
+	
 	public Provider() {		
 	}
 	
-	public Provider(String salutation, String firstName, String lastName) {
+	public Provider(String salutation, String firstName, String lastName, Business business) {
 		super(salutation,firstName,lastName);
+		this.business = business;
 	}
 	
 	@Override

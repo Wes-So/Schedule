@@ -32,12 +32,11 @@ public class BusinessOperations {
 		return businessDao.find(id);
 	}	
 	
-	public boolean isBusinessExists(String businessName){
+	private boolean isBusinessExists(String businessName){
 		return find(businessName) != null ? true:false;
 	}
 	
-	public boolean isBusinessExists(long id){
-		System.out.println(find(id));
+	private boolean isBusinessExists(long id){
 		return find(id) != null ? true:false;
 	}	
 
